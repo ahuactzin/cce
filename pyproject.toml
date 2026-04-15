@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cce"
+version = "0.6.0"
+description = "Cashia's credit engine (CCE)"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "Cashia" }
+]
+dependencies = [
+    "pandas==1.5.3",
+    "numpy==1.26.0",
+    "openpyxl>=3.1",
+    "mysql-connector-python>=9.0",
+    "schedule>=1.2",
+    "art>=6.0",
+    "boto3>=1.34",
+    "cashia-core==1.1.0"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+cce = [
+    "data/*.csv",
+    "data/*.xlsx"
+]
+
+[project.scripts]
+cc-engine = "cce.engine_controller:main"
+cce-db = "cce.db_manager:main"
