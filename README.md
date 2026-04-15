@@ -1,0 +1,341 @@
+# Cashia Credit Engine (CCE)
+
+**CCE (Cashia Credit Engine)** is the module responsible for the
+**credit decision and parameter correction engine** within the Cashia
+ecosystem.
+
+It executes the business logic used to:
+
+-   process model applications
+-   update internal statistics
+-   maintain the credit engine database
+-   compute parameter corrections
+-   orchestrate credit model updates
+
+CCE is designed to run as an **internal engine** that can be triggered
+manually, scheduled, or executed by other Cashia services.
+
+CCE depends on:
+
+-   **cashia-core** -- shared utilities, configuration, storage
+    abstraction
+-   **cashia-model** -- machine learning models
+-   **pandas / numpy** -- data processing
+-   **sqlite** -- local engine database
+
+------------------------------------------------------------------------
+
+# 1. Requirements
+
+Before installing CCE, ensure the following are available:
+
+-   Python **3.11**
+-   pip
+-   Access to the following repositories:
+
+```{=html}
+<!-- -->
+```
+    cashia-core
+    cashia-model
+    cce
+
+Recommended tools:
+
+-   **Anaconda / Miniconda**
+-   **Visual Studio Code**
+
+------------------------------------------------------------------------
+
+# 2. Environment Setup
+
+## Option A --- Using Conda (recommended)
+
+Create the environment:
+
+``` bash
+conda create -n cashia_env python=3.11
+```
+
+Activate it:
+
+``` bash
+conda activate cashia_env
+```
+
+------------------------------------------------------------------------
+
+## Option B --- Using venv
+
+Create a virtual environment:
+
+``` bash
+python -m venv cashia_env
+```
+
+Activate it:
+
+### Windows
+
+``` bash
+cashia_env\Scripts\activate
+```
+
+### Linux / macOS
+
+``` bash
+source cashia_env/bin/activate
+```
+
+------------------------------------------------------------------------
+
+# 3. Installation
+
+Navigate to the root directory containing the Cashia repositories.
+
+Example structure:
+
+    cashia
+    │
+    ├── cashia-core
+    ├── cashia-model
+    ├── cce
+    ├── cashia-api
+    └── mlp
+
+Install dependencies in editable mode:
+
+``` bash
+pip install -e cashia-core
+pip install -e cashia-model
+pip install -e cce
+```
+
+Editable mode is recommended during development.
+
+------------------------------------------------------------------------
+
+# 4. Project Structure
+
+A typical structure of the CCE project:
+
+    cce
+    │   pyproject.toml
+    │   README.md
+    │
+    └───src
+        └───cce
+            │   engine_controller.py
+            │   db_manager.py
+            │   models_manager.py
+            │   statistics_manager.py
+            │
+            ├── data
+            ├── logs
+            └── utils
+
+### Key modules
+
+  Module                    Description
+  ------------------------- -----------------------------
+  `engine_controller.py`    Main engine orchestration
+  `db_manager.py`           SQLite database management
+  `models_manager.py`       Model loading and execution
+  `statistics_manager.py`   Statistics computation
+  `utils/`                  Helper utilities
+
+------------------------------------------------------------------------
+
+# 5. Engine Database
+
+CCE maintains an internal **SQLite database** used to track engine
+statistics and parameter updates.
+
+Typical tables may include:
+
+-   `stats_ponderation_mdc`
+-   `models_statistics`
+-   `engine_logs`
+
+The database is created automatically if it does not exist.
+
+Example location:
+
+    Temp/mdc/mdc_db.db
+
+The database location may be dynamically resolved depending on the
+execution environment.
+
+------------------------------------------------------------------------
+
+# 6. Command Line Execution
+
+CCE defines entry points in `pyproject.toml` such as:
+
+``` toml
+[project.scripts]
+cce-engine = "cce.engine_controller:main"
+cce-db = "cce.db_manager:main"
+```
+
+This allows execution from the command line.
+
+Example:
+
+Run the credit engine:
+
+``` bash
+cce-engine
+```
+
+Initialize or inspect the database:
+
+``` bash
+cce-db
+```
+
+------------------------------------------------------------------------
+
+# 7. Typical Workflow
+
+The CCE engine usually follows this process:
+
+1.  Load new credit applications
+2.  Identify model categories
+3.  Compute statistics
+4.  Update model parameters
+5.  Store results in the engine database
+
+Simplified workflow:
+
+    applications → models → statistics → parameter correction → database update
+
+------------------------------------------------------------------------
+
+# 8. Example Execution
+
+Example manual execution from a terminal:
+
+``` bash
+cce-engine
+```
+
+Or directly through Python:
+
+``` python
+from cce.engine_controller import main
+
+main()
+```
+
+------------------------------------------------------------------------
+
+# 9. Interaction with Other Cashia Modules
+
+CCE interacts with other components as follows:
+
+  Component      Role
+  -------------- ----------------------------------
+  cashia-core    shared configuration and storage
+  cashia-model   machine learning models
+  cashia-api     external service layer
+
+CCE acts as the **internal computation engine**, while the API exposes
+results externally.
+
+------------------------------------------------------------------------
+
+# 10. Configuration
+
+CCE uses configuration files managed through **cashia-core**.
+
+Typical resources include:
+
+-   model configuration files
+-   calibration parameters
+-   historical statistics
+
+These resources are accessed through:
+
+``` python
+from cashia_core.common_tools.storage import get_storage
+from cashia_core.common_tools.configuration.resource_keys import get_resource_path
+```
+
+Example:
+
+``` python
+storage = get_storage()
+
+config_df = storage.read_excel(
+    get_resource_path("configuration")
+)
+```
+
+------------------------------------------------------------------------
+
+# 11. Development Notes
+
+## Editable install
+
+During development install using:
+
+``` bash
+pip install -e cce
+```
+
+## Reinstall after changes
+
+If dependencies change:
+
+``` bash
+pip install -e cce --upgrade
+```
+
+------------------------------------------------------------------------
+
+# 12. Troubleshooting
+
+### Database errors
+
+If the database schema changes, the local database may need to be
+deleted and recreated.
+
+Example:
+
+    delete mdc_db.db
+    ``
+
+    The engine will recreate it on the next run.
+
+    ---
+
+    ### Dependency conflicts
+
+    Ensure that the following packages are installed:
+
+cashia-core cashia-model
+
+
+    Reinstall if needed:
+
+    ```bash
+    pip install -e cashia-core --upgrade
+    pip install -e cashia-model --upgrade
+
+------------------------------------------------------------------------
+
+# 13. Future Improvements
+
+Possible future improvements include:
+
+-   migration from SQLite to a centralized database
+-   integration with AWS services
+-   monitoring and logging improvements
+
+------------------------------------------------------------------------
+
+# Author
+
+Juan Manuel Ahuactzin\
+Cashia Project
