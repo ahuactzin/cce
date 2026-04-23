@@ -70,7 +70,7 @@ def read_previous_applications(first_day, end_date):
             # Filtrar el DataFrame dejando solo las filas con fecha menor o igual a limit_date
             df = df[df["Fecha"] <= limit_date]
             first_day = max_date
-            print("Archivo cargado exitosamente.")
+            print("File uploaded successfully.")
         else:
             # No hay datos previos para el rango de fechas especificado no se usarán los datos previos
             # por lo que pueden ignorarse
@@ -121,6 +121,10 @@ def get_all_applications(first_day, end_date, units):
 
                 if num_rows != 0:
                     df = pd.DataFrame(rows, columns=PROMOK_TABLE_COLUMNS)
+
+                    # 🔧 Convertimos inmediatamente la fecha del nuevo DataFrame
+                    df["Fecha"] = pd.to_datetime(df["Fecha"])
+
                     promok_all_units_df = pd.concat(
                         [promok_all_units_df, df], ignore_index=True
                     )
@@ -203,7 +207,6 @@ def get_theoretical_daily_lendings(first_day, end_of_the_month, units):
     # iterar cada fila del archivo de configuración
     for _, row in quotas.iterrows():
         unit = row["Unidad"]
-        print("***** Processing theoretical lending for unit: ", unit)
         quota = row["Monto Total Esperado"]
         quota_cupo = row["Cupo"]
         prospecting = row["Prospección"]
