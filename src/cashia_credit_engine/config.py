@@ -4,11 +4,6 @@ import tempfile
 import os
 from dotenv import load_dotenv
 
-# HOST = "promok.mx"  # Host
-# DATABASE = "promokmx_promocashprod"  # Nombre de la base de datos
-# USER = "promokmx_consultas"  # Usuario de la base de datos
-# PASSWORD = "pr.24QPC#"  # Contraseña del usuario
-
 load_dotenv()  # Carga las variables de entorno desde el archivo .env
 
 HOST = os.getenv("DB_HOST")
